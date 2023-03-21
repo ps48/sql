@@ -2,6 +2,9 @@ FROM ubuntu:18.04
 
 LABEL authors="penghuo@gmail.com"
 
+# fixes Ubuntu 18.04 JDK install failing https://github.com/geerlingguy/ansible-role-java/issues/64
+RUN mkdir -p /usr/share/man/man1/
+
 RUN apt update
 RUN apt install default-jdk -y \
     && apt install wget -y \
@@ -18,7 +21,7 @@ RUN wget https://dlcdn.apache.org/spark/spark-${SPARK_VERSION}/spark-${SPARK_VER
 # download aws-sdk, aws-hadoop jars
 RUN wget https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.11.901/aws-java-sdk-bundle-1.11.901.jar \
     && mv aws-java-sdk-bundle-1.11.901.jar /opt/spark/jars/.
-RUN wget https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.2.4/ \
+RUN wget https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.2.4/hadoop-aws-3.2.4.jar  \
     && mv hadoop-aws-3.2.4.jar /opt/spark/jars/.
 
 # add configuration

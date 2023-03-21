@@ -3,6 +3,7 @@
 The docker-compose includes
 
 - OpenSearch 2.5
+- OpenSearch Dashboards 2.5
 - Spark 3.2.1
 
 ## Setup Dev Env
@@ -28,19 +29,19 @@ EOF
 ### 1. build spark image
 
 ```
-docker build --pull --rm -f "spark/Dockerfile" -t maximus/spark:v3.2.1 "spark"
+docker build --pull --rm -f "spark/Dockerfile" -t maximus/spark:v3.2.1 "spark" --network host
 ```
 
 ### 2. build OpenSearch image
 
 ```
-docker build --pull --rm -f "opensearch/Dockerfile" -t maximus/opensearch:2.5.0 "opensearch"
+docker build --pull --rm -f "opensearch/Dockerfile" -t maximus/opensearch:2.5.0 "opensearch" --network host
 ```
 
 ### 3. build OpenSearch Dashboards image
 
 ```
-docker build --pull --rm -f "opensearch-dashboards/Dockerfile" -t maximus/opensearch-dashboards:2.5.0 "opensearch-dashboards"
+docker build --pull --rm -f "opensearch-dashboards/Dockerfile" -t maximus/opensearch-dashboards:2.5.0 "opensearch-dashboards" --network host
 ```
 
 ### 4. bootstrap env
