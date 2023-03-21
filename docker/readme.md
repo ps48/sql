@@ -1,12 +1,14 @@
-
 ## Introduction
+
 The docker-compose includes
-* OpenSearch 2.5
-* Spark 3.2.1
+
+- OpenSearch 2.5
+- Spark 3.2.1
 
 ## Setup Dev Env
 
 ### 0, Prepare test data
+
 ```
 1. create /tmp/maximus folder which already mount to docker
 mkdir -p $HOME/tmp/maximus
@@ -24,22 +26,33 @@ EOF
 ```
 
 ### 1. build spark image
+
 ```
 docker build --pull --rm -f "spark/Dockerfile" -t maximus/spark:v3.2.1 "spark"
 ```
 
 ### 2. build OpenSearch image
+
 ```
 docker build --pull --rm -f "opensearch/Dockerfile" -t maximus/opensearch:2.5.0 "opensearch"
 ```
 
-### 3. bootstrap env
+### 3. build OpenSearch Dashboards image
+
+```
+docker build --pull --rm -f "opensearch-dashboards/Dockerfile" -t maximus/opensearch-dashboards:2.5.0 "opensearch-dashboards"
+```
+
+### 4. bootstrap env
+
 ```
 docker compose -f "docker-compose.yml" up -d --build
 ```
 
 ## Test
+
 ### Create table - Only required at first time
+
 ```
 curl -XPOST 'http://localhost:9200/_plugins/_ppl' \
 --header 'Content-Type: application/json' \
@@ -50,6 +63,7 @@ curl -XPOST 'http://localhost:9200/_plugins/_ppl' \
 ```
 
 ### Query table
+
 ```
 curl -XPOST 'http://localhost:9200/_plugins/_ppl' \
 --header 'Content-Type: application/json' \
