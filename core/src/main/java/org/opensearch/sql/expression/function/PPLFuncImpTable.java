@@ -22,6 +22,7 @@ import static org.opensearch.sql.expression.function.BuiltinFunctionName.ADDTIME
 import static org.opensearch.sql.expression.function.BuiltinFunctionName.AND;
 import static org.opensearch.sql.expression.function.BuiltinFunctionName.ARRAY;
 import static org.opensearch.sql.expression.function.BuiltinFunctionName.ARRAY_LENGTH;
+import static org.opensearch.sql.expression.function.BuiltinFunctionName.ARRAY_ZIP;
 import static org.opensearch.sql.expression.function.BuiltinFunctionName.ASCII;
 import static org.opensearch.sql.expression.function.BuiltinFunctionName.ASIN;
 import static org.opensearch.sql.expression.function.BuiltinFunctionName.ATAN;
@@ -819,6 +820,7 @@ public class PPLFuncImpTable {
 
       registerOperator(ARRAY, PPLBuiltinOperators.ARRAY);
       registerOperator(ARRAY_LENGTH, SqlLibraryOperators.ARRAY_LENGTH);
+      registerOperator(ARRAY_ZIP, PPLBuiltinOperators.ARRAY_ZIP);
       registerOperator(FORALL, PPLBuiltinOperators.FORALL);
       registerOperator(EXISTS, PPLBuiltinOperators.EXISTS);
       registerOperator(FILTER, PPLBuiltinOperators.FILTER);

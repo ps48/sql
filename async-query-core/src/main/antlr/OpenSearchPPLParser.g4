@@ -885,6 +885,7 @@ jsonFunctionName
 collectionFunctionName
    : ARRAY
    | ARRAY_LENGTH
+   | ARRAY_ZIP
    ;
 
 lambdaFunctionName

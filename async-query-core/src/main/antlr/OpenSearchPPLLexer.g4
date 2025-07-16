@@ -397,6 +397,7 @@ JSON_VALID:                         'JSON_VALID';
 // COLLECTION FUNCTIONS
 ARRAY:                              'ARRAY';
 ARRAY_LENGTH:                       'ARRAY_LENGTH';
+ARRAY_ZIP:                          'ARRAY_ZIP';
 
 // LAMBDA FUNCTIONS
 //EXISTS:                             'EXISTS';
