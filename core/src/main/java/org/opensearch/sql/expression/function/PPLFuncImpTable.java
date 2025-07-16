@@ -820,7 +820,7 @@ public class PPLFuncImpTable {
 
       registerOperator(ARRAY, PPLBuiltinOperators.ARRAY);
       registerOperator(ARRAY_LENGTH, SqlLibraryOperators.ARRAY_LENGTH);
-      registerOperator(ARRAY_ZIP, PPLBuiltinOperators.ARRAY_ZIP);
+      registerOperator(ARRAY_ZIP, SqlLibraryOperators.ARRAYS_ZIP);
       registerOperator(FORALL, PPLBuiltinOperators.FORALL);
       registerOperator(EXISTS, PPLBuiltinOperators.EXISTS);
       registerOperator(FILTER, PPLBuiltinOperators.FILTER);

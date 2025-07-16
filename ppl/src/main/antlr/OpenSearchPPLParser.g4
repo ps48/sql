@@ -729,6 +729,7 @@ geoipFunctionName
 collectionFunctionName
     : ARRAY
     | ARRAY_LENGTH
+    | ARRAY_ZIP
     | FORALL
     | EXISTS
     | FILTER
