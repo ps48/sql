@@ -64,6 +64,56 @@ Example::
     | 4             |
     +---------------+
 
+ARRAY_ZIP
+---------
+
+Description
+>>>>>>>>>>>
+
+Version: 3.1.0
+
+Usage: ``array_zip(array1, array2, ...)`` combines multiple arrays element-wise into an array of struct objects. Each struct contains indexed fields (0, 1, 2, etc.) corresponding to the input arrays. The result array length equals the shortest input array length.
+
+**Note:** This function requires the Calcite engine to be enabled (``plugins.sql.engine.calcite.enabled = true``).
+
+Argument type: array1:ARRAY, array2:ARRAY, ... (accepts 1 or more arrays)
+
+Return type: ARRAY (of structs with indexed field names)
+
+Example::
+
+    PPL> source=people | eval result = array_zip(array(1, 2, 3), array('a', 'b', 'c')) | fields result | head 1
+    fetched rows / total rows = 1/1
+    +--------------------------------------------------+
+    | result                                           |
+    |--------------------------------------------------|
+    | [{"0":1,"1":"a"},{"0":2,"1":"b"},{"0":3,"1":"c"}]|
+    +--------------------------------------------------+
+
+    PPL> source=people | eval result = array_zip(array(1, 2, 3, 4), array('a', 'b')) | fields result | head 1
+    fetched rows / total rows = 1/1
+    +----------------------------------+
+    | result                           |
+    |----------------------------------|
+    | [{"0":1,"1":"a"},{"0":2,"1":"b"}]|
+    +----------------------------------+
+
+    PPL> source=people | eval result = array_zip(array(1, 2), array('x', 'y'), array(true, false)) | fields result | head 1
+    fetched rows / total rows = 1/1
+    +--------------------------------------------------------+
+    | result                                                 |
+    |--------------------------------------------------------|
+    | [{"0":1,"1":"x","2":true},{"0":2,"1":"y","2":false}]  |
+    +--------------------------------------------------------+
+
+    PPL> source=people | eval nums = array(10, 20), letters = array('A', 'B'), result = array_zip(nums, letters) | fields result | head 1
+    fetched rows / total rows = 1/1
+    +------------------------------------------+
+    | result                                   |
+    |------------------------------------------|
+    | [{"0":10,"1":"A"},{"0":20,"1":"B"}]      |
+    +------------------------------------------+
+
 FORALL
 ------
 
@@ -198,4 +248,4 @@ Example::
     | result     |
     |------------|
     | 80         |
-    +------------+ 
+    +------------+
