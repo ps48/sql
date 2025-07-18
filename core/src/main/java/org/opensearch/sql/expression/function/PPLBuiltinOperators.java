@@ -37,6 +37,7 @@ import org.opensearch.sql.expression.function.CollectionUDF.FilterFunctionImpl;
 import org.opensearch.sql.expression.function.CollectionUDF.ForallFunctionImpl;
 import org.opensearch.sql.expression.function.CollectionUDF.ReduceFunctionImpl;
 import org.opensearch.sql.expression.function.CollectionUDF.TransformFunctionImpl;
+import org.opensearch.sql.expression.function.multivalue.MvAppendFunction;
 import org.opensearch.sql.expression.function.jsonUDF.JsonAppendFunctionImpl;
 import org.opensearch.sql.expression.function.jsonUDF.JsonArrayLengthFunctionImpl;
 import org.opensearch.sql.expression.function.jsonUDF.JsonDeleteFunctionImpl;
@@ -337,6 +338,9 @@ public class PPLBuiltinOperators extends ReflectiveSqlOperatorTable {
   public static final SqlOperator FILTER = new FilterFunctionImpl().toUDF("filter");
   public static final SqlOperator TRANSFORM = new TransformFunctionImpl().toUDF("transform");
   public static final SqlOperator REDUCE = new ReduceFunctionImpl().toUDF("reduce");
+
+  // Multivalue functions
+  public static final SqlOperator MVAPPEND = new MvAppendFunction().toUDF("mvappend");
 
   private static final RelevanceQueryFunction RELEVANCE_QUERY_FUNCTION_INSTANCE =
       new RelevanceQueryFunction();

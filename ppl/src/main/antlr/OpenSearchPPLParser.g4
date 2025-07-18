@@ -734,6 +734,7 @@ collectionFunctionName
     | FILTER
     | TRANSFORM
     | REDUCE
+    | MVAPPEND
     ;
 
 

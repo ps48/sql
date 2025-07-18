@@ -138,6 +138,7 @@ import static org.opensearch.sql.expression.function.BuiltinFunctionName.MONTHNA
 import static org.opensearch.sql.expression.function.BuiltinFunctionName.MONTH_OF_YEAR;
 import static org.opensearch.sql.expression.function.BuiltinFunctionName.MULTIPLY;
 import static org.opensearch.sql.expression.function.BuiltinFunctionName.MULTI_MATCH;
+import static org.opensearch.sql.expression.function.BuiltinFunctionName.MVAPPEND;
 import static org.opensearch.sql.expression.function.BuiltinFunctionName.NOT;
 import static org.opensearch.sql.expression.function.BuiltinFunctionName.NOTEQUAL;
 import static org.opensearch.sql.expression.function.BuiltinFunctionName.NOW;
@@ -824,6 +825,9 @@ public class PPLFuncImpTable {
       registerOperator(FILTER, PPLBuiltinOperators.FILTER);
       registerOperator(TRANSFORM, PPLBuiltinOperators.TRANSFORM);
       registerOperator(REDUCE, PPLBuiltinOperators.REDUCE);
+
+      // Register multivalue functions
+      registerOperator(MVAPPEND, PPLBuiltinOperators.MVAPPEND);
       // Register Json function
       register(
           JSON_ARRAY,

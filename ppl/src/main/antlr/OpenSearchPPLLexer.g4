@@ -394,6 +394,9 @@ FILTER:                             'FILTER';
 TRANSFORM:                          'TRANSFORM';
 REDUCE:                             'REDUCE';
 
+// MULTIVALUE FUNCTIONS
+MVAPPEND:                           'MVAPPEND';
+
 // JSON FUNCTIONS
 JSON_VALID:                         'JSON_VALID';
 JSON:                               'JSON';

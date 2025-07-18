@@ -67,6 +67,9 @@ public enum BuiltinFunctionName {
   TRANSFORM(FunctionName.of("transform")),
   REDUCE(FunctionName.of("reduce")),
 
+  /** Multivalue functions */
+  MVAPPEND(FunctionName.of("mvappend")),
+
   /** Date and Time Functions. */
   ADDDATE(FunctionName.of("adddate")),
   ADDTIME(FunctionName.of("addtime")),

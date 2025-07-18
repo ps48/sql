@@ -8,6 +8,61 @@ PPL Collection Functions
    :local:
    :depth: 1
 
+MVAPPEND
+--------
+
+Description
+>>>>>>>>>>>
+
+Version: 3.2.0
+
+Usage: ``mvappend(value1, value2, value3...)`` combines one or more values into a single multivalue field. This function accepts a variable number of arguments and automatically flattens nested arrays into a single array. All values are converted to strings for consistent handling of mixed types.
+
+Argument type: value1: ANY, value2: ANY, ...
+
+Return type: ARRAY<VARCHAR>
+
+Key Features:
+- Variable number of arguments
+- Automatic array flattening
+- Mixed type support (all converted to strings)
+- Null value preservation
+- Maintains argument order
+
+Example::
+
+    PPL> source=people | eval result = mvappend("a", "b", "c") | fields result | head 1
+    fetched rows / total rows = 1/1
+    +----------------------------------+
+    | result                           |
+    |----------------------------------|
+    | ["a", "b", "c"]                  |
+    +----------------------------------+
+
+    PPL> source=people | eval result = mvappend(1, "hello", 3.14) | fields result | head 1
+    fetched rows / total rows = 1/1
+    +----------------------------------+
+    | result                           |
+    |----------------------------------|
+    | ["1", "hello", "3.14"]           |
+    +----------------------------------+
+
+    PPL> source=people | eval arr1 = array("x", "y"), result = mvappend(arr1, "z") | fields result | head 1
+    fetched rows / total rows = 1/1
+    +----------------------------------+
+    | result                           |
+    |----------------------------------|
+    | ["x", "y", "z"]                  |
+    +----------------------------------+
+
+    PPL> source=people | eval result = mvappend("start", null, "end") | fields result | head 1
+    fetched rows / total rows = 1/1
+    +----------------------------------+
+    | result                           |
+    |----------------------------------|
+    | ["start", null, "end"]           |
+    +----------------------------------+
+
 ARRAY
 -----
 
@@ -198,4 +253,4 @@ Example::
     | result     |
     |------------|
     | 80         |
-    +------------+ 
+    +------------+
