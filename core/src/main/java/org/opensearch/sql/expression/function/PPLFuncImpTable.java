@@ -223,6 +223,8 @@ import static org.opensearch.sql.expression.function.BuiltinFunctionName.YEARWEE
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -238,6 +240,8 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rex.RexBuilder;
+import org.apache.calcite.rex.RexFieldCollation;
+import org.apache.calcite.rex.RexInputRef;
 import org.apache.calcite.rex.RexLambda;
 import org.apache.calcite.rex.RexNode;
 import org.apache.calcite.sql.SqlAggFunction;
@@ -1191,32 +1195,106 @@ public class PPLFuncImpTable {
                   List.of(ExprCoreType.BINARY),
                   List.of(ExprCoreType.GEO_POINT))));
 
-      register(
-          VALUES,
-          (distinct, field, argList, ctx) ->
-              createAggregateFunction(
-                  ValuesAggFunction.class,
-                  "VALUES",
-                  UserDefinedFunctionUtils.getReturnTypeInferenceForStringArray(),
-                  List.of(field),
-                  argList,
-                  ctx.relBuilder),
-          PPLTypeChecker.wrapUDT(
-              List.of(
-                  List.of(ExprCoreType.BOOLEAN),
-                  List.of(ExprCoreType.BYTE),
-                  List.of(ExprCoreType.SHORT),
-                  List.of(ExprCoreType.INTEGER),
-                  List.of(ExprCoreType.LONG),
-                  List.of(ExprCoreType.FLOAT),
-                  List.of(ExprCoreType.DOUBLE),
-                  List.of(ExprCoreType.STRING),
-                  List.of(ExprCoreType.DATE),
-                  List.of(ExprCoreType.TIME),
-                  List.of(ExprCoreType.TIMESTAMP),
-                  List.of(ExprCoreType.IP),
-                  List.of(ExprCoreType.BINARY),
-                  List.of(ExprCoreType.GEO_POINT))));
+      // Agg call with params for distinct, ignore null and sort keys
+      // register(
+      //     VALUES,
+      //     (distinct, field, argList, ctx) -> {
+      //       RexNode castToString1 = ctx.relBuilder.cast(field, SqlTypeName.VARCHAR);
+      //       RexNode castToString2 = ctx.relBuilder.cast(field, SqlTypeName.VARCHAR);
+      //       return ctx.relBuilder.aggregateCall(
+      //           SqlLibraryOperators.ARRAY_AGG, castToString1).distinct().ignoreNulls(true).sort(castToString2);
+      //     }, null);
+
+     
+      // Agg call with projection for cast fields
+      register(VALUES,
+          (distinct, field, argList, ctx) -> {
+            // Cast the field to VARCHAR for consistent comparison
+            RexNode castToString = ctx.relBuilder.cast(field, SqlTypeName.VARCHAR);
+
+            ctx.relBuilder.projectPlus(castToString);
+
+            // Build the aggregate with sorting on the cast field
+            return ctx.relBuilder
+                .aggregateCall(SqlLibraryOperators.ARRAY_AGG, castToString)
+                .distinct(true)
+                .ignoreNulls(true)
+                .sort(ctx.relBuilder.fields().getLast());
+          }, null);
+
+
+      // register(VALUES,
+      //     (distinct, field, argList, ctx) -> {
+      //       RexNode castToString = ctx.relBuilder.cast(field, SqlTypeName.VARCHAR);
+      //       return ctx.relBuilder.aggregateCall(SqlLibraryOperators.ARRAY_AGG, castToString)
+      //           .distinct()
+      //           .ignoreNulls(true)
+      //           .sort(castToString);
+      //     }, null);
+
+      //{
+      // "error": {
+      //   "reason": "There was internal problem at backend",
+      //   "details": "Index 18 out of bounds for length 18",
+      //   "type": "ArrayIndexOutOfBoundsException"
+      // },
+      // "status": 500
+
+      // register(VALUES,
+      //     (distinct, field, argList, ctx) -> {
+      //       RexNode castToString = ctx.relBuilder.cast(field, SqlTypeName.VARCHAR);
+
+      //       // Get the current field count to reference the aggregate result
+      //       int aggFieldIndex = ctx.relBuilder.fields().size();
+
+      //       return ctx.relBuilder
+      //           .aggregateCall(SqlLibraryOperators.ARRAY_AGG, castToString)
+      //           .distinct()
+      //           .ignoreNulls(true)
+      //           .sort(ctx.relBuilder.field(aggFieldIndex)); // Reference by position
+      //     }, null);
+
+
+
+        // {
+        //   "error": {
+        //     "reason": "Invalid Query",
+        //     "details": "field [bool] not found; input fields are: [bool0]",
+        //     "type": "IllegalArgumentException"
+        //   },
+        //   "status": 400
+        // }
+      // register(VALUES,
+      //     (distinct, field, argList, ctx) -> {
+      //       RexNode castToString = ctx.relBuilder.cast(field, SqlTypeName.VARCHAR);
+
+      //       // Add projection before aggregation
+      //       RelBuilder builder = ctx.relBuilder.projectPlus(castToString);
+      //       int castFieldIndex = builder.fields().size() - 1;
+      //       RexInputRef castFieldRef = builder.field(castFieldIndex);
+
+      //       return builder
+      //           .aggregateCall(SqlLibraryOperators.ARRAY_AGG, castFieldRef)
+      //           .distinct()
+      //           .ignoreNulls(true)
+      //           .sort(castFieldRef);
+      //     }, null);
+
+      // register(VALUES,
+      //     (distinct, field, argList, ctx) -> {
+      //       RexNode castToString = ctx.relBuilder.cast(field, SqlTypeName.VARCHAR);
+
+      //       // Add projection before aggregation
+      //       RelBuilder builder = ctx.relBuilder.projectPlus(castToString);
+      //       int castFieldIndex = builder.fields().size() - 1;
+      //       RexInputRef castFieldRef = builder.field(castFieldIndex);
+
+      //       return builder
+      //           .aggregateCall(SqlLibraryOperators.ARRAY_AGG, castFieldRef)
+      //           .distinct()
+      //           .ignoreNulls(true);
+      //     }, null);
+    
     }
   }
 
