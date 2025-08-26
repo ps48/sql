@@ -319,7 +319,7 @@ public class CalcitePPLFunctionTypeTest extends CalcitePPLAbstractTest {
     verifyErrorMessageContains(
         e,
         "Aggregation function LIST expects field type"
-            + " {[BOOLEAN],[BYTE],[SHORT],[INTEGER],[LONG],[FLOAT],[DOUBLE],[STRING],[DATE],[TIME],[TIMESTAMP],[IP],[BINARY],[GEO_POINT]},"
+            + " {[BOOLEAN],[BYTE],[SHORT],[INTEGER],[LONG],[FLOAT],[DOUBLE],[STRING],[DATE],[TIME],[TIMESTAMP],[IP],[BINARY]},"
             + " but got [ARRAY]");
   }
 
@@ -333,7 +333,7 @@ public class CalcitePPLFunctionTypeTest extends CalcitePPLAbstractTest {
     verifyErrorMessageContains(
         e,
         "Aggregation function VALUES expects field type"
-            + " {[BOOLEAN],[BYTE],[SHORT],[INTEGER],[LONG],[FLOAT],[DOUBLE],[STRING],[DATE],[TIME],[TIMESTAMP],[IP],[BINARY],[GEO_POINT]},"
+            + " {[BOOLEAN],[BYTE],[SHORT],[INTEGER],[LONG],[FLOAT],[DOUBLE],[STRING],[DATE],[TIME],[TIMESTAMP],[IP],[BINARY]},"
             + " but got [ARRAY]");
   }
 
@@ -348,7 +348,7 @@ public class CalcitePPLFunctionTypeTest extends CalcitePPLAbstractTest {
     verifyErrorMessageContains(
         e,
         "Aggregation function LIST expects field type"
-            + " {[BOOLEAN],[BYTE],[SHORT],[INTEGER],[LONG],[FLOAT],[DOUBLE],[STRING],[DATE],[TIME],[TIMESTAMP],[IP],[BINARY],[GEO_POINT]},"
+            + " {[BOOLEAN],[BYTE],[SHORT],[INTEGER],[LONG],[FLOAT],[DOUBLE],[STRING],[DATE],[TIME],[TIMESTAMP],[IP],[BINARY]},"
             + " but got [ARRAY]");
   }
 
@@ -363,7 +363,7 @@ public class CalcitePPLFunctionTypeTest extends CalcitePPLAbstractTest {
     verifyErrorMessageContains(
         e,
         "Aggregation function VALUES expects field type"
-            + " {[BOOLEAN],[BYTE],[SHORT],[INTEGER],[LONG],[FLOAT],[DOUBLE],[STRING],[DATE],[TIME],[TIMESTAMP],[IP],[BINARY],[GEO_POINT]},"
+            + " {[BOOLEAN],[BYTE],[SHORT],[INTEGER],[LONG],[FLOAT],[DOUBLE],[STRING],[DATE],[TIME],[TIMESTAMP],[IP],[BINARY]},"
             + " but got [ARRAY]");
   }
 
@@ -408,9 +408,9 @@ public class CalcitePPLFunctionTypeTest extends CalcitePPLAbstractTest {
     // Verify both show the same allowed types
     verifyErrorMessageContains(
         listException,
-        "[BOOLEAN],[BYTE],[SHORT],[INTEGER],[LONG],[FLOAT],[DOUBLE],[STRING],[DATE],[TIME],[TIMESTAMP],[IP],[BINARY],[GEO_POINT]");
+        "[BOOLEAN],[BYTE],[SHORT],[INTEGER],[LONG],[FLOAT],[DOUBLE],[STRING],[DATE],[TIME],[TIMESTAMP],[IP],[BINARY]");
     verifyErrorMessageContains(
         valuesException,
-        "[BOOLEAN],[BYTE],[SHORT],[INTEGER],[LONG],[FLOAT],[DOUBLE],[STRING],[DATE],[TIME],[TIMESTAMP],[IP],[BINARY],[GEO_POINT]");
+        "[BOOLEAN],[BYTE],[SHORT],[INTEGER],[LONG],[FLOAT],[DOUBLE],[STRING],[DATE],[TIME],[TIMESTAMP],[IP],[BINARY]");
   }
 }

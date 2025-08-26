@@ -526,13 +526,7 @@ public class CalciteMultiValueStatsIT extends PPLIntegTestCase {
                 "source=%s | stats list(ip_value) as ip_list", TEST_INDEX_DATATYPE_NONNUMERIC));
     verifySchema(ipResponse, schema("ip_list", null, "array"));
 
-    // Test with geo_point field
-    JSONObject geoResponse =
-        executeQuery(
-            String.format(
-                "source=%s | stats list(geo_point_value) as geo_list",
-                TEST_INDEX_DATATYPE_NONNUMERIC));
-    verifySchema(geoResponse, schema("geo_list", null, "array"));
+    // Note: geo_point field is not supported by LIST function
   }
 
   @Test
