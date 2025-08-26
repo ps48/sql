@@ -241,6 +241,7 @@ import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.rel.core.AggregateCall;
 import org.apache.calcite.rel.type.RelDataType;
 import org.apache.calcite.rex.RexBuilder;
+import org.apache.calcite.rex.RexInputRef;
 import org.apache.calcite.rex.RexLambda;
 import org.apache.calcite.rex.RexNode;
 import org.apache.calcite.sql.SqlAggFunction;
@@ -1196,81 +1197,50 @@ public class PPLFuncImpTable {
                   List.of(ExprCoreType.IP),
                   List.of(ExprCoreType.BINARY))));
 
-// Solution 4: Manual distinct using GROUP BY (FIXED)
-register(
-    VALUES,
-    (distinct, field, argList, ctx) -> {
-        RelDataType varcharType = ctx.relBuilder.getTypeFactory().createSqlType(SqlTypeName.VARCHAR);
-        RexNode castToVarchar = ctx.relBuilder.getRexBuilder().makeCast(varcharType, field);
-        
-        // ctx.relBuilder
-        //     .sort(castToVarchar); // Sort values
-        
-        return ctx.relBuilder.aggregateCall(SqlLibraryOperators.ARRAY_AGG, castToVarchar)
-                      .distinct(true)
-                      .ignoreNulls(true); 
-    },
-    PPLTypeChecker.wrapUDT(
-        List.of(
-            List.of(ExprCoreType.BOOLEAN),
-            List.of(ExprCoreType.BYTE),
-            List.of(ExprCoreType.SHORT),
-            List.of(ExprCoreType.INTEGER),
-            List.of(ExprCoreType.LONG),
-            List.of(ExprCoreType.FLOAT),
-            List.of(ExprCoreType.DOUBLE),
-            List.of(ExprCoreType.STRING),
-            List.of(ExprCoreType.DATE),
-            List.of(ExprCoreType.TIME),
-            List.of(ExprCoreType.TIMESTAMP),
-            List.of(ExprCoreType.IP),
-            List.of(ExprCoreType.BINARY))));
-      /* APPROACH 1: ARRAY_AGG with DISTINCT (if supported by RelBuilder API)
-      register(
-          VALUES,
-          (distinct, field, argList, ctx) -> {
-            RelDataType varcharType = ctx.relBuilder.getTypeFactory().createSqlType(SqlTypeName.VARCHAR);
-            RexNode castToVarchar = ctx.relBuilder.getRexBuilder().makeCast(varcharType, field);
-            // Try to use DISTINCT=true and add ordering for lexicographical sort
-            // Note: This approach depends on RelBuilder supporting distinct for ARRAY_AGG
-            // and ability to add ORDER BY clause for lexicographical ordering
-            return ctx.relBuilder.aggregateCall(SqlLibraryOperators.ARRAY_AGG, true, castToVarchar);
-          },
-          PPLTypeChecker.wrapUDT(List.of(List.of(ExprCoreType.STRING))));
-      */
-
-      /* APPROACH 2: Manual deduplication using window functions + ARRAY_AGG
+      // VALUES function implementation using Calcite built-ins instead of custom UDAF
+      // 
+      // This implementation provides:
+      // ✅ String conversion: All values cast to VARCHAR
+      // ✅ DISTINCT functionality: Deduplication via .distinct()
+      // ✅ Lexicographical sorting: True string-based ordering via field references
+      // ✅ Collation compatibility: Uses field references instead of expressions
       register(
           VALUES,
           (distinct, field, argList, ctx) -> {
             RelDataType varcharType = ctx.relBuilder.getTypeFactory().createSqlType(SqlTypeName.VARCHAR);
             RexNode castToVarchar = ctx.relBuilder.getRexBuilder().makeCast(varcharType, field);
             
-            // Step 1: Use ROW_NUMBER() OVER (PARTITION BY field ORDER BY field) = 1 to deduplicate
-            // Step 2: Apply ARRAY_AGG with ORDER BY for lexicographical ordering
-            // Step 3: Handle null filtering
-            // Note: This is complex and may require multiple RelBuilder operations
+            // Pre-project the cast field to create a proper field reference for sorting.
+            // This solves the Calcite collation issue by using field references (RexInputRef)
+            // instead of computed expressions (RexCall) which cause UnsupportedOperationException
+            // in RelBuilder.collation() at line 3833.
+            String castFieldName = "_values_cast_" + System.currentTimeMillis(); // Unique name to avoid conflicts
+            RexNode aliasedCast = ctx.relBuilder.alias(castToVarchar, castFieldName);
+            ctx.relBuilder.projectPlus(aliasedCast);
             
-            return ctx.relBuilder.aggregateCall(SqlLibraryOperators.ARRAY_AGG, castToVarchar);
+            // Get field reference to the projected cast field
+            RexInputRef castFieldRef = ctx.relBuilder.field(castFieldName);
+            
+            // Use the same field reference for both aggregation and sorting.
+            // This provides proper lexicographical sorting since we're sorting by the string representation.
+            RelBuilder.AggCall aggCall = ctx.relBuilder.aggregateCall(SqlLibraryOperators.ARRAY_AGG, castFieldRef);
+            return aggCall.distinct().sort(castFieldRef);
           },
-          PPLTypeChecker.wrapUDT(List.of(List.of(ExprCoreType.STRING))));
-      */
-
-      /* APPROACH 3: Using RelCollations for ordering (research needed)
-      register(
-          VALUES,  
-          (distinct, field, argList, ctx) -> {
-            RelDataType varcharType = ctx.relBuilder.getTypeFactory().createSqlType(SqlTypeName.VARCHAR);
-            RexNode castToVarchar = ctx.relBuilder.getRexBuilder().makeCast(varcharType, field);
-            
-            // Attempt to create RelCollation for lexicographical ordering
-            // RelCollation collation = RelCollations.of(RelFieldCollation...);
-            // ctx.relBuilder.sort(collation);  // Sort before aggregating
-            
-            return ctx.relBuilder.aggregateCall(SqlLibraryOperators.ARRAY_AGG, castToVarchar);
-          },
-          PPLTypeChecker.wrapUDT(List.of(List.of(ExprCoreType.STRING))));
-      */
+          PPLTypeChecker.wrapUDT(
+              List.of(
+                  List.of(ExprCoreType.BOOLEAN),
+                  List.of(ExprCoreType.BYTE),
+                  List.of(ExprCoreType.SHORT),
+                  List.of(ExprCoreType.INTEGER),
+                  List.of(ExprCoreType.LONG),
+                  List.of(ExprCoreType.FLOAT),
+                  List.of(ExprCoreType.DOUBLE),
+                  List.of(ExprCoreType.STRING),
+                  List.of(ExprCoreType.DATE),
+                  List.of(ExprCoreType.TIME),
+                  List.of(ExprCoreType.TIMESTAMP),
+                  List.of(ExprCoreType.IP),
+                  List.of(ExprCoreType.BINARY))));
 
     }
   }
