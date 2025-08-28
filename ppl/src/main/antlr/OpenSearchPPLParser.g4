@@ -503,6 +503,7 @@ statsFunctionName
    | PERCENTILE_APPROX
    | EARLIEST
    | LATEST
+   | VALUES
    ;
 
 

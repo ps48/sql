@@ -205,6 +205,7 @@ import static org.opensearch.sql.expression.function.BuiltinFunctionName.UPPER;
 import static org.opensearch.sql.expression.function.BuiltinFunctionName.UTC_DATE;
 import static org.opensearch.sql.expression.function.BuiltinFunctionName.UTC_TIME;
 import static org.opensearch.sql.expression.function.BuiltinFunctionName.UTC_TIMESTAMP;
+import static org.opensearch.sql.expression.function.BuiltinFunctionName.VALUES;
 import static org.opensearch.sql.expression.function.BuiltinFunctionName.VARPOP;
 import static org.opensearch.sql.expression.function.BuiltinFunctionName.VARSAMP;
 import static org.opensearch.sql.expression.function.BuiltinFunctionName.WEEK;
@@ -258,6 +259,7 @@ import org.opensearch.sql.calcite.utils.PlanUtils;
 import org.opensearch.sql.calcite.utils.UserDefinedFunctionUtils;
 import org.opensearch.sql.exception.ExpressionEvaluationException;
 import org.opensearch.sql.executor.QueryType;
+import org.opensearch.sql.data.type.ExprCoreType;
 
 public class PPLFuncImpTable {
   private static final Logger logger = LogManager.getLogger(PPLFuncImpTable.class);
@@ -1089,6 +1091,39 @@ public class PPLFuncImpTable {
               extractTypeCheckerFromUDF(PPLBuiltinOperators.PERCENTILE_APPROX),
               PERCENTILE_APPROX.name(),
               false));
+      
+      register(
+          VALUES,
+          (distinct, field, argList, ctx) -> {
+            RelDataType varcharType = ctx.relBuilder.getTypeFactory().createSqlType(SqlTypeName.VARCHAR);
+            RexNode castToVarchar = ctx.relBuilder.getRexBuilder().makeCast(varcharType, field);
+
+            ctx.relBuilder.projectPlus(castToVarchar);
+
+            List<String> fieldNames = ctx.relBuilder.peek().getRowType().getFieldNames();
+            String castFieldName = fieldNames.get(fieldNames.size() - 1);
+            RexNode castFieldRef = ctx.relBuilder.field(castFieldName);
+            return ctx.relBuilder.aggregateCall(SqlLibraryOperators.ARRAY_AGG, castToVarchar)
+                .distinct(true)
+                .ignoreNulls(true)
+                .sort(castFieldRef);
+
+          },
+          PPLTypeChecker.wrapUDT(
+              List.of(
+                  List.of(ExprCoreType.BOOLEAN),
+                  List.of(ExprCoreType.BYTE),
+                  List.of(ExprCoreType.SHORT),
+                  List.of(ExprCoreType.INTEGER),
+                  List.of(ExprCoreType.LONG),
+                  List.of(ExprCoreType.FLOAT),
+                  List.of(ExprCoreType.DOUBLE),
+                  List.of(ExprCoreType.STRING),
+                  List.of(ExprCoreType.DATE),
+                  List.of(ExprCoreType.TIME),
+                  List.of(ExprCoreType.TIMESTAMP),
+                  List.of(ExprCoreType.IP),
+                  List.of(ExprCoreType.BINARY))));
     }
   }
 
