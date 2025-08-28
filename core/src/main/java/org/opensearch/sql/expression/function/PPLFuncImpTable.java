@@ -1095,9 +1095,11 @@ public class PPLFuncImpTable {
       register(
           VALUES,
           (distinct, field, argList, ctx) -> {
-            RelDataType varcharType = ctx.relBuilder.getTypeFactory().createSqlType(SqlTypeName.VARCHAR);
-            RexNode castToVarchar = ctx.relBuilder.getRexBuilder().makeCast(varcharType, field);
+            RexNode castToVarchar = ctx.relBuilder.getRexBuilder().makeCast(UserDefinedFunctionUtils.NULLABLE_STRING, field);
 
+            // Project the casted field first to establish proper collation context in Calcite.
+            // Using castToVarchar directly in sort() causes collation issues because the cast
+            // expression lacks the relational context needed for proper string comparison.
             ctx.relBuilder.projectPlus(castToVarchar);
 
             List<String> fieldNames = ctx.relBuilder.peek().getRowType().getFieldNames();
